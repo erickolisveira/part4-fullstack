@@ -38,9 +38,25 @@ const mostBlogs = (blogs) => {
   return highest(filteredAuthors, 'blogs')
 }
 
+const mostLikes = (blogs) => {
+  let filteredAuthors = []
+  blogs.map(item => {
+    let blogItem = {author: item.author, likes: item.likes}
+    let found = filteredAuthors.find(authorItem => authorItem.author === blogItem.author)
+    if(!found) {
+      filteredAuthors.push(blogItem)
+    }
+    else {
+      found.likes += blogItem.likes
+    }
+  })
+  return highest(filteredAuthors, 'likes')
+}
+
 module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
   mostBlogs,
+  mostLikes
 }

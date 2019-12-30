@@ -87,8 +87,15 @@ describe('blog with higher likes', () => {
 })
 
 describe('author with most blogs', () => {
-  test('when the list is filled return the author with most blogs', () => {
+  test('when list is filled return the author with most blogs', () => {
     const result = listHelper.mostBlogs(blogs)
     expect(result).toEqual({ author: 'Robert C. Martin', blogs: 4 })
+  })
+})
+
+describe('author with most likes', () => {
+  test('when list is filled return the author with most likes', () => {
+    const result = listHelper.mostLikes(blogs)
+    expect(result).toEqual({ author: 'Robert C. Martin', likes: 31 })
   })
 })
