@@ -6,10 +6,15 @@ const totalLikes = (blogs) => {
   return blogs.reduce((sum, current) => sum + current.likes, 0) 
 }
 
-const favoriteBlog = (blogs) => {
-  const max = blogs.reduce((prev, curr) => {
-    return (prev.likes > curr.likes ? prev : curr)
+const highest = (items, key) => {
+  const max = items.reduce((prev, curr) => {
+    return (prev[key] > curr[key] ? prev : curr)
   }, 0)
+  return max
+}
+
+const favoriteBlog = (blogs) => {
+  const max = highest(blogs, 'likes')
   const blog = {
     title: max.title,
     author: max.author,
@@ -18,8 +23,24 @@ const favoriteBlog = (blogs) => {
   return blog.likes !== undefined ? blog : max
 }
 
+const mostBlogs = (blogs) => {
+  let filteredAuthors = []
+  blogs.map(item => {
+    let blogItem = {author: item.author, blogs: 1}
+    let found = filteredAuthors.find(authorItem => authorItem.author === blogItem.author)
+    if(!found) {
+      filteredAuthors.push(blogItem)
+    }
+    else {
+      found.blogs++
+    }
+  })
+  return highest(filteredAuthors, 'blogs')
+}
+
 module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
+  mostBlogs,
 }
