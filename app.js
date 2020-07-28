@@ -3,15 +3,19 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const app = express()
-const blogsRouter = require('./controllers/blogs')
-const middleware = require('./utils/middleware')
 const mongoose = require('mongoose')
 
-console.log('Connecting to: ', config.MONGODB_URI)
+const usersRouter = require('./controllers/UserController')
+const blogsRouter = require('./controllers/BlogController')
+const loginRouter = require('./controllers/LoginController')
+const middleware = require('./utils/middleware')
+const { populate } = require('./models/User')
+
+console.log('Connecting to mongoDB...')
 
 mongoose.connect(config.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
-        console.log('Connected to MongoDB')
+        console.log('Connected to MongoDB.')
     })
     .catch((error) => {
         console.log('Error connectingo to MongoDB: ', error.message)
@@ -22,6 +26,8 @@ app.use(express.static('build'))
 app.use(bodyParser.json())
 app.use(middleware.requestLogger)
 
+app.use('/api/login', loginRouter)
+app.use('/api/users', usersRouter)
 app.use('/api/blogs', blogsRouter)
 
 app.use(middleware.unknownEndpoint)
