@@ -1,5 +1,6 @@
 const config = require('./utils/config')
 const express = require('express')
+require('express-async-errors')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const app = express()
@@ -9,7 +10,6 @@ const usersRouter = require('./controllers/UserController')
 const blogsRouter = require('./controllers/BlogController')
 const loginRouter = require('./controllers/LoginController')
 const middleware = require('./utils/middleware')
-const { populate } = require('./models/User')
 
 console.log('Connecting to mongoDB...')
 

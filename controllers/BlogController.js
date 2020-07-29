@@ -1,15 +1,30 @@
 const blogsRouter = require('express').Router()
+const jwt = require('jsonwebtoken')
 const Blog = require('../models/Blog')
 const User = require('../models/User')
+
+const getTokenFrom = (request) => {
+    const authorization = request.get('authorization')
+    if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
+        return authorization.substring(7)
+    }
+    return null
+}
 
 blogsRouter.get('/', async (request, response) => {
     const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
     return response.json(blogs.map(blog => blog.toJSON()))
 })
 
-blogsRouter.post('/', async (request, response) => {
-    const user = await User.findById(request.body.userId)
+blogsRouter.post('/', async (request, response, next) => {
+    const token = getTokenFrom(request)
+    const decodedToken = jwt.verify(token, process.env.SECRET) 
+    if (!token || !decodedToken.id) {
+        return response.status(401).json({ error: "Missing or invalid token." })
+    }
     
+    const user = await User.findById(decodedToken.id)
+
     const newBlog = {
         title: request.body.title,
         author: request.body.author,
@@ -32,11 +47,11 @@ blogsRouter.post('/', async (request, response) => {
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
-    try {
-        await Blog.findByIdAndDelete(request.params.id)
-        return response.status(204).end()
-    }catch(exception){
-        return response.status(400).end()
+    const blog = await Blog.findByIdAndDelete(request.params.id)
+    if (blog) {
+        response.status(204).end()
+    } else {
+        response.status(400).end()
     }
 })
 
@@ -47,10 +62,11 @@ blogsRouter.put('/:id', async (request, response) => {
         url: request.body.url,
         likes: request.body.likes
     }
-    try {
-        const note = await Blog.findByIdAndUpdate(request.params.id, updatedBlog, { new: true })
-        response.json(note.toJSON())
-    }catch(exception) {
+
+    const blog = await Blog.findByIdAndUpdate(request.params.id, updatedBlog, { new: true })
+    if (blog) {
+        response.json(blog.toJSON());
+    } else {
         response.status(400).end() 
     }
 })
