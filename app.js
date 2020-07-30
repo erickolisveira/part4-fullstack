@@ -13,6 +13,8 @@ const middleware = require('./utils/middleware')
 
 console.log('Connecting to mongoDB...')
 
+mongoose.set("useCreateIndex", true);
+
 mongoose.connect(config.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
         console.log('Connected to MongoDB.')
